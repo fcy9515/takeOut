@@ -33,19 +33,19 @@ const devWebpackConfig = merge(baseWebpackConfig, {
   // these devServer options should be customized in /config/index.js
   devServer: {
     before(app){
-      app.get('/seller',(req,res) => {
+      app.get('/api/seller',(req,res) => {
         res.json({
           errno:0,
           data:seller
         })
       }),
-        app.get('/goods',(req,res)=>{
+        app.get('/api/goods',(req,res)=>{
           res.json({
             errno:0,
             data:goods
           })
         }),
-        app.get('/comment',(req,res)=>{
+        app.get('/api/comment',(req,res)=>{
           res.json({
             errno:0,
             data:comment
