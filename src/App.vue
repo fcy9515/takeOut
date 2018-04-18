@@ -43,7 +43,7 @@
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">
-  @import "common/stylus/minin"
+  @import "common/stylus/minin";
   .tab
     display: flex
     width: 100%
