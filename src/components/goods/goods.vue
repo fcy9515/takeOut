@@ -30,6 +30,9 @@
                   <span class="now">￥{{food.price}}</span>
                   <span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
                 </div>
+                <div class="cartcontrol-wrapper">
+                  <cartcontrol @add="addFood" :food="food"></cartcontrol>
+                </div>
               </div>
             </li>
           </ul>
@@ -37,7 +40,9 @@
       </ul>
     </div>
     <shopcart :delivery-price="seller.deliveryPrice"
-              :min-price="seller.minPrice" ></shopcart>
+              :min-price="seller.minPrice"
+              :select-foods="selectFoods"
+              ref="shopcart"></shopcart>
   </div>
 </template>
 <style lang="stylus" rel="stylesheet/stylus">
@@ -141,10 +146,16 @@
               text-decoration: line-through
               font-size: 10px
               color: rgb(147, 153, 159)
+          .cartcontrol-wrapper
+            position: absolute
+            right: 0
+            bottom: 12px
 </style>
 <script type="text/ecmascript-6">
   import BScroll from 'better-scroll';
   import shopcart from 'components/shopcart/shopcart.vue';
+  import cartcontrol from 'components/cartcontrol/index.vue';
+
   const ERR_OK = 0;
   export default {
     props: {
@@ -169,6 +180,17 @@
           }
         }
         return 0;
+      },
+      selectFoods() {
+        let foods = [];
+        this.goods.forEach((good) => {
+          good.foods.forEach((food) => {
+            if (food.count) {
+              foods.push(food);
+            }
+          });
+        });
+        return foods;
       }
     },
     created() {
@@ -195,7 +217,16 @@
         this.foodsScroll.scrollToElement(el, 300);
         // console.log(index);
       },
-      _initScroll () {
+      addFood(target, food) {
+        this._drop(target);
+      },
+      _drop(target) {
+        // 体验优化,异步执行下落动画
+        this.$nextTick(() => {
+          this.$refs.shopcart.drop(target);
+        });
+      },
+      _initScroll() {
         this.menuScroll = new BScroll(this.$refs.menuWrapper, {
           click: true
         });
@@ -221,7 +252,8 @@
       }
     },
     components: {
-      shopcart
+      shopcart,
+      cartcontrol
     }
   };
 </script>
