@@ -12,10 +12,10 @@
     </div>
     <div class="foods-wrapper" ref="foodsWrapper">
       <ul>
-        <li v-for="item in goods" class="food-list" :key="item.id" ref="foodList">
+        <li v-for="(item,index) in goods" class="food-list" :key="index" ref="foodList">
           <h1 class="title">{{item.name}}</h1>
           <ul>
-            <li v-for="food in item.foods" class="food-item border-1px" :key="food.id">
+            <li v-for="(food,index) in item.foods" class="food-item border-1px" :key="index">
               <div class="icon">
                 <img width="57" height="57" :src="food.icon">
               </div>
@@ -36,6 +36,8 @@
         </li>
       </ul>
     </div>
+    <shopcart :delivery-price="seller.deliveryPrice"
+              :min-price="seller.minPrice" ></shopcart>
   </div>
 </template>
 <style lang="stylus" rel="stylesheet/stylus">
@@ -142,6 +144,7 @@
 </style>
 <script type="text/ecmascript-6">
   import BScroll from 'better-scroll';
+  import shopcart from 'components/shopcart/shopcart.vue';
   const ERR_OK = 0;
   export default {
     props: {
@@ -216,6 +219,9 @@
           this.listHeight.push(height);
         }
       }
+    },
+    components: {
+      shopcart
     }
   };
 </script>
