@@ -19,7 +19,7 @@
             <span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
           </div>
           <div class="cartcontrol-wrapper">
-            <cartcontrol :food="food"></cartcontrol>
+            <cartcontrol @add="addFood" :food="food"></cartcontrol>
           </div>
           <transition name="fade">
             <div @click.stop.prevent="addFirst" class="buy"
@@ -34,12 +34,36 @@
           <p class="text">{{food.info}}</p>
         </div>
         <split></split>
+        <div class="rating">
+          <h1 class="title">商品评价</h1>
+          <commentselect @select="selectRating" @toggle="toggleContent" :selectType="selectType"
+                         :onlyContent="onlyContent" :desc="desc"
+                         :ratings="food.ratings"></commentselect>
+          <div class="rating-wrapper">
+            <ul v-show="food.ratings && food.ratings.length">
+              <li v-show="needShow(rating.rateType,rating.text)" :key="index"
+                  v-for="(rating,index) in food.ratings" class="rating-item border-1px">
+                <div class="user">
+                  <span class="name">{{rating.username}}</span>
+                  <img class="avatar" width="12" height="12" :src="rating.avatar">
+                </div>
+                <div class="time">{{rating.rateTime | formatDate}}</div>
+                <p class="text">
+                  <span :class="{'icon-thumb_up':rating.rateType===0,'icon-thumb_down':rating.rateType===1}">
+                  </span>{{rating.text}}
+                </p>
+              </li>
+            </ul>
+            <div class="no-rating" v-show="!food.ratings || !food.ratings.length">暂无评价</div>
+          </div>
+        </div>
       </div>
     </div>
   </transition>
 
 </template>
 <style lang="stylus" rel="stylesheet/stylus">
+  @import "../../common/stylus/minin.styl";
   .food
     position: fixed
     left: 0
@@ -139,13 +163,63 @@
         padding: 0 8px
         font-size: 12px
         color: rgb(77, 85, 93)
+    .rating
+      padding-top: 18px
+      .title
+        line-height: 14px
+        margin-left: 18px
+        font-size: 14px
+        color: rgb(7, 17, 27)
+      .rating-wrapper
+        padding: 0 18px
+        .rating-item
+          position: relative
+          padding: 16px 0
+          border-1px(rgba(7, 17, 27, 0.1))
+          .user
+            position: absolute
+            right: 0
+            top: 16px
+            line-height: 12px
+            font-size: 0
+            .name
+              display: inline-block
+              margin-right: 6px
+              vertical-align: top
+              font-size: 10px
+              color: rgb(147, 153, 159)
+            .avatar
+              border-radius: 50%
+          .time
+            margin-bottom: 6px
+            line-height: 12px
+            font-size: 10px
+            color: rgb(147, 153, 159)
+          .text
+            line-height: 16px
+            font-size: 12px
+            color: rgb(7, 17, 27)
+            .icon-thumb_up, .icon-thumb_down
+              margin-right: 4px
+              line-height: 16px
+              font-size: 12px
+            .icon-thumb_up
+              color: rgb(0, 160, 220)
+            .icon-thumb_down
+              color: rgb(147, 153, 159)
+        .no-rating
+          padding: 16px 0
+          font-size: 12px
+          color: rgb(147, 153, 159)
 </style>
 <script type="text/ecmascript-6">
   import BScroll from 'better-scroll';
   import Vue from 'vue';
   import cartcontrol from 'components/cartcontrol/index.vue';
   import split from 'components/split/index.vue';
-
+  import commentselect from 'components/commentselect/index.vue';
+  import {formatDate} from 'common/js/date';
+  const ALL = 2;
   export default {
     props: {
       food: {
@@ -154,12 +228,21 @@
     },
     data() {
       return {
-        showFlag: false
+        showFlag: false,
+        selectType: ALL,
+        onlyContent: true,
+        desc: {
+          all: '全部',
+          positive: '推荐',
+          negative: '吐槽'
+        }
       };
     },
     methods: {
       show() {
         this.showFlag = true;
+        this.selectType = ALL;
+        this.onlyContent = true;
         this.$nextTick(() => {
           if (!this.scroll) {
             this.scroll = new BScroll(this.$refs.food, {
@@ -179,11 +262,43 @@
         }
         this.$emit('add', event.target);
         Vue.set(this.food, 'count', 1);
+      },
+      needShow(type, text) {
+        if (this.onlyContent && !text) {
+          return false;
+        }
+        if (this.selectType === ALL) {
+          return true;
+        } else {
+          return type === this.selectType;
+        }
+      },
+      addFood(target) {
+        this.$emit('add', target);
+      },
+      selectRating(type) {
+        this.selectType = type;
+        this.$nextTick(() => {
+          this.scroll.refresh();
+        });
+      },
+      toggleContent() {
+        this.onlyContent = !this.onlyContent;
+        this.$nextTick(() => {
+          this.scroll.refresh();
+        });
+      }
+    },
+    filters: {
+      formatDate(time) {
+        let date = new Date(time);
+        return formatDate(date, 'yyyy-MM-dd hh:mm');
       }
     },
     components: {
       cartcontrol,
-      split
+      split,
+      commentselect
     }
   };
 </script>
