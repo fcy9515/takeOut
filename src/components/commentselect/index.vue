@@ -2,7 +2,7 @@
   <div class="commentselect">
     <div class="comment-type border-1px">
       <span @click="select(2,$event)" class="block positive" :class="{'active':selectType===2}">{{desc.all}}<span
-        class="count">{{comments.length}}</span></span>
+        class="count">{{ratings.length}}</span></span>
       <span @click="select(0,$event)" class="block positive" :class="{'active':selectType===0}">{{desc.positive}}<span
         class="count">{{positives.length}}</span></span>
       <span @click="select(1,$event)" class="block negative" :class="{'active':selectType===1}">{{desc.negative}}<span
@@ -69,7 +69,7 @@
 
   export default {
     props: {
-      comments: {
+      ratings: {
         type: Array,
         default() {
           return [];
@@ -96,13 +96,13 @@
     },
     computed: {
       positives() {
-        return this.comments.filter((comment) => {
-          return comment.rateType === POSITIVE;
+        return this.ratings.filter((rating) => {
+          return rating.rateType === POSITIVE;
         });
       },
       negatives() {
-        return this.comments.filter((comment) => {
-          return comment.rateType === NEGATIVE;
+        return this.ratings.filter((rating) => {
+          return rating.rateType === NEGATIVE;
         });
       }
     },
